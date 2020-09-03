@@ -1,0 +1,379 @@
+module oif-open-terminals {
+
+  namespace "http://example.com/oif-open-terminals";
+  prefix oif-open-terminals;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  description
+    "Bla bla...";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  grouping logical-channel-grouping {
+    leaf index {
+      type uint32;
+    }
+
+    leaf description {
+      type string;
+    }
+
+    leaf logical-channel-type {
+      type string;
+    }
+
+    leaf rate-class {
+      type string;
+    }
+
+    leaf trib-protocol {
+      type string;
+    }
+
+    leaf q-value {
+      type decimal64 {
+        fraction-digits 2;
+      }
+      units dB;
+    }
+  }
+
+  grouping fetch-status-grouping {
+    leaf fetch-status {
+      type enumeration {
+        enum in-progress;
+        enum error;
+        enum done;
+      }
+    }
+  }
+
+  container openconfig-cache {
+    config false;
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+
+    list device {
+      key name;
+
+      leaf name {
+        type leafref {
+          path "/ncs:devices/ncs:device/ncs:name";
+        }
+      }
+
+      container components {
+        tailf:cli-add-mode;
+
+        tailf:action refresh {
+          tailf:actionpoint get-device-components;
+
+          output {
+            leaf status {
+              type string;
+            }
+          }
+        }
+
+        uses fetch-status-grouping;
+
+        list component {
+          key name;
+
+          leaf name {
+            type string;
+          }
+
+          leaf parent {
+            type string;
+          }
+
+          leaf type {
+            type string;
+          }
+
+          leaf location {
+            type string;
+          }
+
+          leaf description {
+            type string;
+          }
+
+          leaf mfg-name {
+            type string;
+          }
+
+          leaf software-version {
+            type string;
+          }
+
+          leaf serial-no {
+            type string;
+          }
+
+          leaf part-no {
+            type string;
+          }
+
+          leaf removable {
+            type boolean;
+          }
+
+          leaf oper-status {
+            type string;
+          }
+
+          leaf used-power {
+            type uint32;
+            units watts;
+          }
+
+          leaf line-port {
+            type string;
+          }
+
+          leaf logical-channel {
+            type string;
+          }
+
+          leaf-list subcomponents {
+            tailf:cli-list-syntax;
+            type string;
+          }
+        }
+      }
+
+      container operational-modes {
+        tailf:cli-add-mode;
+
+        tailf:action refresh {
+          tailf:actionpoint get-device-operational-modes;
+
+          output {
+            leaf status {
+              type string;
+            }
+          }
+        }
+
+        uses fetch-status-grouping;
+
+        list mode {
+          key "mode-id";
+
+          leaf mode-id {
+            type uint16;
+          }
+
+          leaf description {
+            type string;
+          }
+
+          leaf vendor-id {
+            type string;
+          }
+        }
+      }
+
+      container inventory {
+        tailf:cli-add-mode;
+
+        tailf:action generate {
+          tailf:actionpoint generate-device-inventory;
+        }
+
+        list chassis {
+          key name;
+
+          leaf name {
+            type string;
+          }
+
+          container linecards {
+            tailf:cli-add-mode;
+            list linecard {
+              key name;
+
+              leaf name {
+                type string;
+              }
+
+              leaf power-admin-state {
+                type string;
+              }
+
+              leaf slot-id {
+                type string;
+              }
+
+              container ports {
+                tailf:cli-add-mode;
+                list port {
+                  key name;
+
+                  leaf name {
+                    type string;
+                  }
+
+                  choice port-type {
+                    container terminal-line {
+                      container optical-channel {
+                        tailf:cli-add-mode;
+                        leaf name {
+                          type string;
+                        }
+
+                        leaf frequency {
+                          type string;
+                        }
+
+                        leaf operational-mode {
+                          type uint16;
+                        }
+
+                        leaf target-output-power {
+                          type decimal64 {
+                            fraction-digits 2;
+                          }
+                          units dBm;
+                        }
+
+                        container logical-channel {
+                          tailf:cli-add-mode;
+                          uses logical-channel-grouping;
+
+                          leaf allocation {
+                            type decimal64 {
+                              fraction-digits 3;
+                            }
+                            units Gbps;
+                          }
+                        }
+                      }
+                    }
+
+                    container terminal-client {
+                      container transceiver {
+                        tailf:cli-add-mode;
+
+                        leaf name {
+                          type string;
+                        }
+
+                        leaf oper-status {
+                          type string;
+                        }
+
+                        container physical-channels {
+                          tailf:cli-add-mode;
+
+                          list channel {
+                            key index;
+
+                            leaf index {
+                              type uint16;
+                            }
+                          }
+                        }
+
+                        container logical_channels {
+                          tailf:cli-add-mode;
+
+                          list channel {
+                            uses logical-channel-grouping;
+                            key index;
+                            ordered-by user;
+
+                            list next-channel {
+                              key name;
+                              leaf name {
+                                type string;
+                              }
+
+                              leaf allocation {
+                                type decimal64 {
+                                  fraction-digits 3;
+                                }
+                                units Gbps;
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                }
+              }
+            }
+          }
+
+          container fans {
+            tailf:cli-add-mode;
+            list fan {
+              key name;
+
+              leaf name {
+                type string;
+              }
+            }
+          }
+
+          container psus {
+            tailf:cli-add-mode;
+            list psu {
+              key name;
+
+              leaf name {
+                type string;
+              }
+            }
+          }
+        }
+
+      }
+    }
+  }
+
+  augment "/ncs:devices/ncs:device" {
+    tailf:action generate-openconfig-cache {
+      tailf:actionpoint generate-openconfig-cache;
+      input {
+        leaf get-components {
+          type boolean;
+          default true;
+        }
+
+        leaf get-operational-modes {
+          type boolean;
+          default true;
+        }
+
+        leaf generate-inventory {
+          type boolean;
+          default true;
+        }
+      }
+      output {
+        leaf message {
+          type string;
+        }
+      }
+    }
+  }
+
+}

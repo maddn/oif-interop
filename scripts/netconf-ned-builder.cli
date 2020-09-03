@@ -1,0 +1,23 @@
+netconf-ned-builder project openconfig-oif 1.0 device xr0 local-user admin vendor cisco
+commit
+fetch-module-list
+module cisco-xr-openconfig-alarms-deviations * select
+module cisco-xr-openconfig-if-ethernet-deviations * select
+module cisco-xr-openconfig-if-ip-deviations * select
+module cisco-xr-openconfig-interfaces-deviations * select
+module cisco-xr-openconfig-lldp-deviations * select
+module cisco-xr-openconfig-platform-cpu-deviations * select
+module cisco-xr-openconfig-platform-deviations * select
+module cisco-xr-openconfig-platform-port-deviations * select
+module cisco-xr-openconfig-platform-psu-deviations * select
+module cisco-xr-openconfig-platform-transceiver-deviations * select
+module cisco-xr-openconfig-system-deviations * select
+module cisco-xr-openconfig-telemetry-deviations * select
+module cisco-xr-openconfig-terminal-device-deviations * select
+module cisco-xr-openconfig-transport-line-common-deviations * select
+module cisco-xr-openconfig-vlan-deviations * select
+module openconfig-platform-fan * select
+module openconfig-platform-linecard * select
+
+
+do show netconf-ned-builder project openconfig-oif 1.0 module | select status selected,downloaded | select status selected | de-select namespace | de-select submodule
