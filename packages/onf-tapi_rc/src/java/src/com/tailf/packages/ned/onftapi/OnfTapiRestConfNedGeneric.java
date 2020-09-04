@@ -69,8 +69,8 @@ public class OnfTapiRestConfNedGeneric extends NedComGenericRestConfBase {
             if (op == OutBoundOp.POST &&
                 path.toString().equals("/data/tapi-common:context/tapi-connectivity:connectivity-context") &&
                 json != null) {
-                if (json.has("connectivity-service")) {
-                    JsonObject jsonConnService = json.getObject("connectivity-service");
+                if (json.has("tapi-connectivity:cconnectivity-service")) {
+                    JsonObject jsonConnService = json.getObject("tapi-connectivity:cconnectivity-service");
                     List<String> names = Arrays.asList("uuid");
                     JsonTransforms.deleteNodesWithName(jsonConnService, names);
                 }
