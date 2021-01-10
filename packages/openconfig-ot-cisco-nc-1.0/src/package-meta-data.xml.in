@@ -1,0 +1,17 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>openconfig-ot-cisco</name>
+  <package-version>1.0</package-version>
+  <description>Generated netconf package</description>
+  <ncs-min-version>5.3</ncs-min-version>
+  <component>
+    <name>openconfig-ot-cisco</name>
+    <ned>
+      <netconf>
+        <ned-id>to be replaced by build</ned-id>
+      </netconf>
+      <device>
+        <vendor>Cisco</vendor>
+      </device>
+    </ned>
+  </component>
+</ncs-package>

@@ -1,4 +1,4 @@
-netconf-ned-builder project openconfig-oif 1.0 device xr0 local-user admin vendor cisco
+netconf-ned-builder project openconfig-ot-cisco 1.0 device cisco-ot-ned-ref local-user admin vendor cisco
 commit
 fetch-module-list
 module cisco-xr-openconfig-alarms-deviations * select
@@ -14,10 +14,10 @@ module cisco-xr-openconfig-platform-transceiver-deviations * select
 module cisco-xr-openconfig-system-deviations * select
 module cisco-xr-openconfig-telemetry-deviations * select
 module cisco-xr-openconfig-terminal-device-deviations * select
-module cisco-xr-openconfig-transport-line-common-deviations * select
 module cisco-xr-openconfig-vlan-deviations * select
 module openconfig-platform-fan * select
 module openconfig-platform-linecard * select
+module openconfig-transport-line-common * select
 
 
-do show netconf-ned-builder project openconfig-oif 1.0 module | select status selected,downloaded | select status selected | de-select namespace | de-select submodule
+do show netconf-ned-builder project openconfig-ot-cisco 1.0 module | select status selected,downloaded | select status selected | de-select namespace | de-select submodule
