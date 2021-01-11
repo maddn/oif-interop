@@ -1,16 +1,16 @@
-module oif-open-terminals {
+module openconfig-open-terminals {
 
-  namespace "http://example.com/oif-open-terminals";
-  prefix oif-open-terminals;
+  namespace "http://example.com/openconfig-open-terminals";
+  prefix openconfig-open-terminals;
 
-  import ietf-inet-types {
-    prefix inet;
-  }
   import tailf-common {
     prefix tailf;
   }
   import tailf-ncs {
     prefix ncs;
+  }
+  import openconfig-platform {
+    prefix oc-platform;
   }
 
   description
@@ -19,6 +19,85 @@ module oif-open-terminals {
   revision 2016-01-01 {
     description
       "Initial revision.";
+  }
+
+  grouping end-point-grouping {
+    leaf device {
+      tailf:cli-drop-node-name;
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+      mandatory true;
+    }
+
+    leaf client-transceiver {
+      tailf:cli-drop-node-name;
+      tailf:info "Client transceiver name";
+      type leafref {
+        path "deref(../device)/../ncs:config/oc-platform:components" +
+             "/oc-platform:component/oc-platform:name";
+      }
+      mandatory true;
+    }
+
+    leaf line-transceiver {
+      type string;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+  }
+
+  list ot-connectivity  {
+    key name;
+
+    leaf name {
+      tailf:info "Unique service id";
+      tailf:cli-allow-range;
+      type string;
+    }
+
+    uses ncs:service-data;
+    ncs:servicepoint ot-connectivity-servicepoint;
+
+
+    leaf frequency {
+      type uint32;
+    }
+
+    leaf target-output-power {
+      type decimal64 {
+        fraction-digits 2;
+      }
+      units dBm;
+    }
+
+    container a-end {
+      tailf:cli-compact-syntax;
+      tailf:cli-flatten-container;
+      tailf:cli-sequence-commands;
+      uses end-point-grouping;
+    }
+
+    container z-end {
+      tailf:cli-compact-syntax;
+      tailf:cli-flatten-container;
+      tailf:cli-sequence-commands;
+      uses end-point-grouping;
+    }
+
+    leaf operational-state {
+      type string;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+
+    tailf:action check-operational-state {
+      tailf:actionpoint check-ot-connectivity-state;
+    }
   }
 
   grouping logical-channel-grouping {
@@ -60,18 +139,35 @@ module oif-open-terminals {
     }
   }
 
-  container openconfig-cache {
-    config false;
-    tailf:cdb-oper {
-      tailf:persistent true;
-    }
+  augment "/ncs:devices/ncs:device" {
+    container openconfig-cache {
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
 
-    list device {
-      key name;
+      tailf:action generate-all {
+        tailf:actionpoint generate-openconfig-cache;
+        input {
+          leaf get-components {
+            type boolean;
+            default true;
+          }
 
-      leaf name {
-        type leafref {
-          path "/ncs:devices/ncs:device/ncs:name";
+          leaf get-operational-modes {
+            type boolean;
+            default true;
+          }
+
+          leaf generate-inventory {
+            type boolean;
+            default true;
+          }
+        }
+        output {
+          leaf message {
+            type string;
+          }
         }
       }
 
@@ -229,6 +325,10 @@ module oif-open-terminals {
                     type string;
                   }
 
+                  leaf inventory-id {
+                    type string;
+                  }
+
                   choice port-type {
                     container terminal-line {
                       container optical-channel {
@@ -262,6 +362,18 @@ module oif-open-terminals {
                             }
                             units Gbps;
                           }
+                        }
+                      }
+
+                      container transceiver {
+                        tailf:cli-add-mode;
+
+                        leaf name {
+                          type string;
+                        }
+
+                        leaf oper-status {
+                          type string;
                         }
                       }
                     }
@@ -343,37 +455,9 @@ module oif-open-terminals {
               }
             }
           }
-        }
 
-      }
-    }
-  }
-
-  augment "/ncs:devices/ncs:device" {
-    tailf:action generate-openconfig-cache {
-      tailf:actionpoint generate-openconfig-cache;
-      input {
-        leaf get-components {
-          type boolean;
-          default true;
-        }
-
-        leaf get-operational-modes {
-          type boolean;
-          default true;
-        }
-
-        leaf generate-inventory {
-          type boolean;
-          default true;
-        }
-      }
-      output {
-        leaf message {
-          type string;
         }
       }
     }
   }
-
 }

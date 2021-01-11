@@ -10,7 +10,7 @@ FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 
 ## Uncomment and patch the line below if you have a dependency to a NED
 ## or to other YANG files
-YANGPATH += ../../onf-tapi_rc/src/ncsc-out/modules/yang \
+YANGPATH += ../../openconfig-ot-cisco-nc-1.0/src/ncsc-out/modules/yang \
 # 	../../<pkt-name>/src/yang
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)

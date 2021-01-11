@@ -1,0 +1,97 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+
+    <device>
+      <name>{a-end/device}</name>
+      <config>
+
+        <!-- Enable client port -->
+        <interfaces xmlns="http://openconfig.net/yang/interfaces">
+          <interface>
+            <name>{substring-after(client-transceiver, substring-before(client-transceiver, 'Optics'))}</name>
+            <config>
+              <name>{substring-after(client-transceiver, substring-before(client-transceiver, 'Optics'))}</name>
+              <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:opticalChannel</type>
+              <description>Client port for transceiver {client-transceiver}</description>
+              <enabled>true</enabled>
+            </config>
+          </interface>
+        </interfaces>
+
+        <!-- Enable line port -->
+        <interfaces xmlns="http://openconfig.net/yang/interfaces">
+          <interface>
+            <name>{substring-after(line-transceiver, substring-before(line-transceiver, 'Optics'))}</name>
+            <config>
+              <name>{substring-after(line-transceiver, substring-before(line-transceiver, 'Optics'))}</name>
+              <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:opticalChannel</type>
+              <description>Line (trunk) port for transceiver {line-transceiver}</description>
+              <enabled>true</enabled>
+            </config>
+          </interface>
+        </interfaces>
+
+        <!-- Configure optical channel -->
+        <components xmlns="http://openconfig.net/yang/platform">
+          <component>
+            <name>{$A_END_OPTICAL_CHANNEL}</name>
+            <optical-channel xmlns="http://openconfig.net/yang/terminal-device">
+              <config>
+                <frequency>{/frequency}</frequency>
+                <target-output-power>{/target-output-power * 100}</target-output-power>
+              </config>
+            </optical-channel>
+          </component>
+        </components>
+
+      </config>
+    </device>
+
+    <device>
+      <name>{z-end/device}</name>
+      <config>
+
+        <!-- Enable client port -->
+        <interfaces xmlns="http://openconfig.net/yang/interfaces">
+          <interface>
+            <name>{substring-after(client-transceiver, substring-before(client-transceiver, 'Optics'))}</name>
+            <config>
+              <name>{substring-after(client-transceiver, substring-before(client-transceiver, 'Optics'))}</name>
+              <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:opticalChannel</type>
+              <description>Client port for transceiver {client-transceiver}</description>
+              <enabled>true</enabled>
+            </config>
+          </interface>
+        </interfaces>
+
+        <!-- Enable line port -->
+        <interfaces xmlns="http://openconfig.net/yang/interfaces">
+          <interface>
+            <name>{substring-after(line-transceiver, substring-before(line-transceiver, 'Optics'))}</name>
+            <config>
+              <name>{substring-after(line-transceiver, substring-before(line-transceiver, 'Optics'))}</name>
+              <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:opticalChannel</type>
+              <description>Line (trunk) port for transceiver {line-transceiver}</description>
+              <enabled>true</enabled>
+            </config>
+          </interface>
+        </interfaces>
+
+        <!-- Configure optical channel -->
+        <components xmlns="http://openconfig.net/yang/platform">
+          <component>
+            <name>{$Z_END_OPTICAL_CHANNEL}</name>
+            <optical-channel xmlns="http://openconfig.net/yang/terminal-device">
+              <config>
+                <frequency>{/frequency}</frequency>
+                <target-output-power>{/target-output-power * 100}</target-output-power>
+              </config>
+            </optical-channel>
+          </component>
+        </components>
+
+      </config>
+    </device>
+
+  </devices>
+</config-template>

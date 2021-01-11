@@ -1,6 +1,7 @@
 # -*- mode: python; python-indent: 4 -*-
 import threading
 import traceback
+import re
 
 import ncs
 from ncs.dp import Action
@@ -9,12 +10,11 @@ _ncs = __import__('_ncs') # pylint: disable=invalid-name
 
 OUTPUT = '''Retreiving components in a background thread...
 Use the following CLI to check the status:\n'''
-CLI = 'show openconfig-cache device {} {} fetch-status\n'
-
+CLI = 'show devices device {} openconfig-cache {} fetch-status\n'
 
 class GetComponentsThread(threading.Thread):
     def __init__(self, log, username, device_name):
-        super(GetComponentsThread, self).__init__()
+        super().__init__()
         self.username = username
         self.device_name = device_name
         self.log = log
@@ -59,19 +59,19 @@ class GetComponentsThread(threading.Thread):
                         'logical-channel'] = channel.index
 
     def write_component_cache(self, root):
-        device = root.openconfig_cache.device.create(self.device_name)
-        del device.components.component
+        cache = root.devices.device[self.device_name].openconfig_cache
+        del cache.components.component
 
         for component_name, component_dict in self.components_dict.items():
-            component = device.components.component.create(component_name)
+            component = cache.components.component.create(component_name)
             for key, value in component_dict.items():
                 component[key] = value
 
     def set_status(self, status):
         with ncs.maapi.single_write_trans(self.username, 'python') as th:
             th.set_elem(status,
-                        f'/openconfig-cache/device{{{self.device_name}}}'
-                        f'/components/fetch-status')
+                        f'/devices/device{{{self.device_name}}}'
+                        f'/openconfig-cache/components/fetch-status')
             th.apply()
 
     def run(self):
@@ -124,7 +124,7 @@ def copy_values(from_node, to_node, tag_names):
 
 class GetOperationalModesThread(threading.Thread):
     def __init__(self, log, username, device_name):
-        super(GetOperationalModesThread, self).__init__()
+        super().__init__()
         self.username = username
         self.device_name = device_name
         self.log = log
@@ -137,18 +137,18 @@ class GetOperationalModesThread(threading.Thread):
             oc_opt_term__terminal_device.operational_modes.mode]
 
     def write_modes_cache(self, root):
-        device = root.openconfig_cache.device[self.device_name]
-        del device.operational_modes.mode
+        cache = root.devices.device[self.device_name].openconfig_cache
+        del cache.operational_modes.mode
         for mode_dict in self.modes:
-            mode = device.operational_modes.mode.create(mode_dict.pop('mode-id'))
+            mode = cache.operational_modes.mode.create(mode_dict.pop('mode-id'))
             for key, value in mode_dict.items():
                 mode[key] = value
 
     def set_status(self, status):
         with ncs.maapi.single_write_trans(self.username, 'python') as th:
             th.set_elem(status,
-                        f'/openconfig-cache/device{{{self.device_name}}}'
-                        f'/operational-modes/fetch-status')
+                        f'/devices/device{{{self.device_name}}}'
+                        f'/openconfig-cache/operational-modes/fetch-status')
             th.apply()
 
     def run(self):
@@ -193,13 +193,13 @@ class Inventory():
         _ = next(iter(self.live_components), None)
         _ = next(iter(self.live_channels), None)
 
-
     def read_component_cache(self, root):
-        device = root.openconfig_cache.device[self.device_name]
-        for component in device.components.component:
+        cache = root.devices.device[self.device_name].openconfig_cache
+        for component in cache.components.component:
             self.components_dict[component.name] = {
                 'type': component.type,
                 'subcomponents': component.subcomponents.as_list(),
+                'location': component.location,
                 'oper-status': component.oper_status,
                 'line-port': component.line_port,
                 'logical-channel': component.logical_channel
@@ -256,13 +256,12 @@ class Inventory():
             if next_index:
                 self.add_logical_channel(next_index, channel_list)
 
-
-    def find_optical_channel(self, port_name, linecard_name):
+    def find_optical_channel(self, transceiver_name, port_name, linecard_name):
         optical_channel_name = next((
             component_name
             for component_name, component in self.components_dict.items()
             if component['type'] == 'OPTICAL_CHANNEL' and
-            component['line-port'] == port_name), None)
+            component['line-port'] == transceiver_name), None)
 
         if not optical_channel_name:
             port_parent = self.components_dict[port_name]['parent']
@@ -301,11 +300,15 @@ class Inventory():
                     channel.allocation = values.get('allocation')
                     channel.q_value = live_channel.otn.state.q_value.instant
 
-    def process_transceiver(self, port, transceiver_name):
-        transceiver = port.terminal_client.transceiver
+    def process_transceiver(self, port, transceiver_name, has_optical_channel):
+        transceiver = (port.terminal_line.transceiver if has_optical_channel
+                       else port.terminal_client.transceiver)
         transceiver.name = transceiver_name
         transceiver.oper_status = self.components_dict[transceiver_name].get(
             'oper-status')
+
+        if has_optical_channel:
+            return
 
         for physical_channel in self.live_components[
                 transceiver_name].transceiver.physical_channels.channel:
@@ -317,29 +320,44 @@ class Inventory():
             self.add_logical_channel(logical_channel,
                                      transceiver.logical_channels.channel)
 
+    def generate_inventory_id(self, hostname, chassis, linecard, port):
+        def get_location(component_name):
+            return self.components_dict[component_name]['location']
+
+        return (f'/ne={hostname}'
+                f'/r={re.sub("^Rack ", "", get_location(chassis))}'
+                f'/sl={re.sub("^[^/]*/", "", get_location(linecard))}'
+                f'/p={re.sub("^.*/", "", port)}')
+
     def process_components(self, device):
+        cache = device.openconfig_cache
+
         for chassis_name in self.find_children(None, 'CHASSIS'):
-            chassis = device.inventory.chassis.create(chassis_name)
+            chassis = cache.inventory.chassis.create(chassis_name)
 
             for linecard_name in self.find_children(chassis_name, 'LINECARD'):
                 linecard = chassis.linecards.linecard.create(linecard_name)
+
                 copy_values(self.live_components[linecard_name].
                             oc_linecard__linecard.state, linecard,
                             ['power-admin-state', 'slot-id'])
 
                 for port_name in self.find_children(linecard_name, 'PORT'):
                     port = linecard.ports.port.create(port_name)
-
-                    optical_channel_name = self.find_optical_channel(
-                        port_name, linecard_name)
-
-                    if optical_channel_name:
-                        self.process_optical_channel(port, optical_channel_name)
+                    port.inventory_id = self.generate_inventory_id(
+                        device.config.oc_sys__system.config.hostname,
+                        chassis_name, linecard_name, port_name)
 
                     transceiver_name = next(iter(self.find_children(
                         port_name, 'TRANSCEIVER')), None)
+                    optical_channel_name = self.find_optical_channel(
+                        transceiver_name, port_name, linecard_name)
+
+                    if optical_channel_name:
+                        self.process_optical_channel(port, optical_channel_name)
                     if transceiver_name:
-                        self.process_transceiver(port, transceiver_name)
+                        self.process_transceiver(
+                            port, transceiver_name, bool(optical_channel_name))
 
             for fan_name in self.find_children(chassis_name, 'FAN'):
                 chassis.fans.fan.create(fan_name)
@@ -350,17 +368,14 @@ class Inventory():
     def generate(self):
         self.log.info('generate-inventory device name: ', self.device_name)
         with ncs.maapi.single_read_trans(self.username, 'python') as th:
-            root = ncs.maagic.get_root(th)
-            if self.device_name not in root.openconfig_cache.device:
-                return
-            self.read_component_cache(root)
+            self.read_component_cache(ncs.maagic.get_root(th))
 
         with ncs.maapi.single_write_trans(self.username, 'python') as th:
             root = ncs.maagic.get_root(th)
             self.init_transaction(root)
 
-            device = root.openconfig_cache.device[self.device_name]
-            del device.inventory.chassis
+            device = root.devices.device[self.device_name]
+            del device.openconfig_cache.inventory.chassis
 
             self.process_components(device)
             th.apply()
@@ -370,7 +385,7 @@ class GetComponentsAction(Action):
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
         self.log.info('action name: ', name)
-        device_name = kp[1][0].as_pyval()
+        device_name = kp[2][0].as_pyval()
         GetComponentsThread(self.log, uinfo.username, device_name).start()
         output.status = OUTPUT + CLI.format(device_name, 'components')
 
@@ -379,7 +394,7 @@ class GetOperationalModesAction(Action):
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
         self.log.info('action name: ', name)
-        device_name = kp[1][0].as_pyval()
+        device_name = kp[2][0].as_pyval()
         GetOperationalModesThread(self.log, uinfo.username, device_name).start()
         output.status = OUTPUT + CLI.format(device_name, 'operational-modes')
 
@@ -388,11 +403,11 @@ class GenerateInventoryAction(Action):
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
         self.log.info('action name: ', name)
-        inventory = Inventory(self.log, uinfo.username, kp[1][0].as_pyval())
+        inventory = Inventory(self.log, uinfo.username, kp[2][0].as_pyval())
         inventory.generate()
 
 
-class GenerateOpenConfigCache(Action):
+class GenerateOpenConfigCacheAction(Action):
     def generate_cache(self, device_name, username, get_components,
                        get_operational_modes, generate_inventory):
         try:
@@ -420,7 +435,7 @@ class GenerateOpenConfigCache(Action):
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
         self.log.info('action name: ', name)
-        device_name = kp[0][0].as_pyval()
+        device_name = kp[1][0].as_pyval()
 
         if (input.get_components or input.get_operational_modes or
                 input.generate_inventory):
@@ -436,36 +451,3 @@ class GenerateOpenConfigCache(Action):
                 message += CLI.format(device_name, 'operational-modes')
 
             output.message = message
-
-
-# ---------------------------------------------
-# COMPONENT THREAD THAT WILL BE STARTED BY NCS.
-# ---------------------------------------------
-class Main(ncs.application.Application):
-    def setup(self):
-        # The application class sets up logging for us. It is accessible
-        # through 'self.log' and is a ncs.log.Log instance.
-        self.log.info('Main RUNNING')
-
-        # When using actions, this is how we register them:
-        #
-        self.register_action('get-device-components', GetComponentsAction)
-        self.register_action('get-device-operational-modes',
-                             GetOperationalModesAction)
-        self.register_action('generate-device-inventory',
-                             GenerateInventoryAction)
-        self.register_action('generate-openconfig-cache',
-                             GenerateOpenConfigCache)
-
-        # If we registered any callback(s) above, the Application class
-        # took care of creating a daemon (related to the service/action point).
-
-        # When this setup method is finished, all registrations are
-        # considered done and the application is 'started'.
-
-    def teardown(self):
-        # When the application is finished (which would happen if NCS went
-        # down, packages were reloaded or some error occurred) this teardown
-        # method will be called.
-
-        self.log.info('Main FINISHED')
