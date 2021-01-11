@@ -12,6 +12,9 @@ module openconfig-open-terminals {
   import openconfig-platform {
     prefix oc-platform;
   }
+  import openconfig-ot-cisco-nc {
+    prefix openconfig-ot-cisco-nc-family;
+  }
 
   description
     "Bla bla...";
@@ -140,7 +143,12 @@ module openconfig-open-terminals {
   }
 
   augment "/ncs:devices/ncs:device" {
+    when "derived-from(ncs:device-type/ncs:netconf/ncs:ned-id, " +
+                      "'openconfig-ot-cisco-nc-family:openconfig-ot-cisco-nc')";
+
     container openconfig-cache {
+      tailf:info "Cached data and actions for OpenConfig NETCONF devices";
+
       config false;
       tailf:cdb-oper {
         tailf:persistent true;

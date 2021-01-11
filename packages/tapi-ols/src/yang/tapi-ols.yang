@@ -1,0 +1,345 @@
+module tapi-ols {
+
+  yang-version 1.1;
+  namespace "http://example.com/tapi-ols";
+  prefix tapi-ols;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  import tapi-common {
+    prefix tapi-common;
+  }
+  import tapi-topology {
+    prefix tapi-topology;
+  }
+  import tapi-notification {
+    prefix tapi-notification;
+  }
+
+  import onf-tapi_rc-gen {
+    prefix onf-tapi_rc-family;
+  }
+  import nokia-nrct-gen {
+    prefix nokia-nrct-family;
+  }
+
+  description
+    "Bla bla...";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  list ols-connectivity {
+    key name;
+    description "This is an RFS skeleton service";
+
+    leaf name {
+      tailf:info "Unique service id";
+      tailf:cli-allow-range;
+      type string;
+    }
+
+    uses ncs:service-data;
+    ncs:servicepoint ols-connectivity-servicepoint;
+
+    leaf ols-controller {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf requested-capacity-gbps {
+      type uint32;
+    }
+
+    leaf service-layer {
+      type tapi-common:layer-protocol-name;
+    }
+
+    leaf layer-protocol-qualifier {
+      type tapi-common:layer-protocol-qualifier;
+    }
+
+    leaf a-end-sip-uuid {
+      type leafref {
+        path "deref(../ols-controller)/../ncs:config/tapi-common:context" +
+             "/tapi-common:service-interface-point/tapi-common:uuid";
+      }
+    }
+
+    leaf z-end-sip-uuid {
+      type leafref {
+        path "deref(../ols-controller)/../ncs:config/tapi-common:context" +
+             "/tapi-common:service-interface-point/tapi-common:uuid";
+      }
+    }
+
+    container constraints {
+      leaf-list include-node {
+        type string;
+      }
+      leaf-list exclude-node {
+        type string;
+      }
+      leaf-list include-link {
+        type string;
+      }
+      leaf-list exclude-link {
+        type string;
+      }
+    }
+
+    leaf restoration-policy {
+      type tapi-topology:restoration-policy;
+    }
+
+    leaf protection-type {
+      type tapi-topology:protection-type;
+    }
+
+    leaf preferred-restoration-layer {
+      type tapi-common:layer-protocol-name;
+    }
+
+    leaf uuid {
+      type string;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+
+    leaf operational-state {
+      type tapi-common:operational-state;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+
+    tailf:action set-operational-state {
+      tailf:actionpoint set-service-operational-state;
+
+      input {
+        leaf state {
+          type tapi-common:operational-state;
+        }
+      }
+    }
+  }
+
+  augment "/ncs:devices/ncs:device" {
+    when "derived-from(ncs:device-type/ncs:generic/ncs:ned-id, " +
+                      "'onf-tapi_rc-family:onf-tapi_rc-gen') or " +
+         "derived-from(ncs:device-type/ncs:generic/ncs:ned-id, " +
+                      "'nokia-nrct-family:nokia-nrct-gen')";
+
+    container tapi-context {
+      tailf:info "Data and actions for TAPI devices";
+
+      container topology {
+        config false;
+        list access-port-owned-node-edge-point {
+          key uuid;
+
+          leaf uuid {
+            type string;
+          }
+
+          leaf device-uuid {
+            type string;
+          }
+
+          leaf owned-node-edge-point-uuid {
+            type string;
+          }
+
+          leaf node-uuid {
+            type string;
+          }
+
+          leaf topology-uuid {
+            type string;
+          }
+        }
+      }
+
+      container notifications {
+        container received {
+          config false;
+          tailf:cdb-oper {
+            tailf:persistent true;
+          }
+          list notification {
+            key 'uuid';
+            uses tapi-notification:notification;
+
+            leaf sequence-number {
+              type uint64;
+            }
+          }
+        }
+
+        leaf login-path {
+          type string;
+        }
+
+        leaf subscription-path {
+          type string;
+        }
+
+        tailf:action subscribe {
+          tailf:actionpoint subscribe-tapi-notifications;
+        }
+
+        tailf:action clear {
+          tailf:actionpoint clear-tapi-notifications;
+        }
+      }
+
+      tailf:action get-sip-summary {
+        tailf:actionpoint get-sip-summary;
+
+        output {
+          leaf service-interface-point-count {
+            type uint32;
+          }
+
+          leaf missing-inventory-id-count {
+            type uint32;
+          }
+        }
+      }
+
+      tailf:action get-topology-summary {
+        tailf:actionpoint get-topology-summary;
+        output {
+          leaf topology-count {
+            type uint32;
+          }
+
+          list topology {
+            key uuid;
+
+            leaf uuid {
+              type string;
+            }
+
+            leaf node-count {
+              type uint32;
+            }
+
+            leaf link-count {
+              type uint32;
+            }
+
+            list node {
+              key uuid;
+
+              leaf uuid {
+                type string;
+              }
+
+              leaf owned-node-edge-point-count {
+                type uint32;
+              }
+
+              leaf missing-inventory-id-count {
+                type uint32;
+              }
+            }
+          }
+        }
+      }
+
+      tailf:action get-connectivity-summary {
+        tailf:actionpoint get-connectivity-summary;
+        output {
+          leaf connectivity-service-count {
+            type uint32;
+          }
+
+          list connectivity-service {
+            key uuid;
+
+            leaf uuid {
+              type string;
+            }
+
+            leaf connection-count {
+              type uint32;
+            }
+          }
+        }
+      }
+
+      tailf:action get-connectivity-service-connections {
+        tailf:actionpoint get-connectivity-service-connections;
+        input {
+          leaf uuid {
+            type string;
+          }
+        }
+
+        output {
+          list connection {
+            key uuid;
+
+            leaf uuid {
+              type string;
+            }
+          }
+        }
+      }
+
+      tailf:action get-equipment-summary {
+        tailf:actionpoint get-equipment-summary;
+        output {
+          leaf device-count {
+            type uint32;
+          }
+
+          list device {
+            key uuid;
+
+            leaf uuid {
+              type string;
+            }
+
+            list equipment-summary {
+              key category;
+
+              leaf category {
+                type string;
+              }
+
+              leaf count {
+                type uint32;
+              }
+            }
+
+            leaf access-port-count {
+              type uint32;
+            }
+
+            leaf missing-corresponding-owned-node-edge-point {
+              type uint32;
+            }
+          }
+
+          leaf physical-span-count {
+            type uint32;
+          }
+        }
+      }
+
+    }
+  }
+}

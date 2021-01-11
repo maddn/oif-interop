@@ -1,0 +1,61 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{ols-controller}</name>
+      <config>
+        <context xmlns="urn:onf:otcc:yang:tapi-common">
+          <connectivity-context xmlns="urn:onf:otcc:yang:tapi-connectivity">
+            <connectivity-service>
+              <uuid>{uuid}</uuid>
+              <name>
+                <value-name>SERVICE_NAME</value-name>
+                <value>{name}</value>
+              </name>
+              <requested-capacity when="{requested-capacity-gbps}">
+                <total-size>
+                  <value>{requested-capacity-gbps}</value>
+                  <unit>GBPS</unit>
+                </total-size>
+              </requested-capacity>
+              <end-point>
+                <local-id>1</local-id>
+                <layer-protocol-name>{service-layer}</layer-protocol-name>
+                <layer-protocol-qualifier>{layer-protocol-qualifier}</layer-protocol-qualifier>
+                <service-interface-point>
+                  <service-interface-point-uuid>{a-end-sip-uuid}</service-interface-point-uuid>
+                </service-interface-point>
+              </end-point>
+              <end-point>
+                <local-id>2</local-id>
+                <layer-protocol-name>{service-layer}</layer-protocol-name>
+                <layer-protocol-qualifier>{layer-protocol-qualifier}</layer-protocol-qualifier>
+                <service-interface-point>
+                  <service-interface-point-uuid>{z-end-sip-uuid}</service-interface-point-uuid>
+                </service-interface-point>
+              </end-point>
+              <service-layer>{service-layer}</service-layer>
+              <service-type>POINT_TO_POINT_CONNECTIVITY</service-type>
+
+              <include-link when="{constraints/include-link}">{constraints/include-link}</include-link>
+              <exclude-link when="{constraints/exclude-link}">{constraints/exclude-link}</exclude-link>
+              <include-node when="{constraints/include-node}">{constraints/include-node}</include-node>
+              <exclude-node when="{constraints/exclude-node}">{constraints/exclude-node}</exclude-node>
+              <?if-ned-id nokia-nrct-gen-1.0:nokia-nrct-gen-1.0?>
+                <administrative-state>UNLOCKED</administrative-state>
+              <?end?>
+
+              <?if {protection-type}?>
+                <resilience-type>
+                  <restoration-policy>{restoration-policy}</restoration-policy>
+                  <protection-type>{protection-type}</protection-type>
+                </resilience-type>
+                <reversion-mode>REVERTIVE</reversion-mode>
+                <preferred-restoration-layer>{preferred-restoration-layer}</preferred-restoration-layer>
+              <?end?>
+            </connectivity-service>
+          </connectivity-context>
+        </context>
+      </config>
+    </device>
+  </devices>
+</config-template>
