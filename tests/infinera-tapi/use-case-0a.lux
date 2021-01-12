@@ -1,0 +1,13 @@
+[global use_case=0c]
+[doc OIF TAPI Interop testing - use case ${use_case}]
+
+[include tapi-tests.luxinc]
+
+[shell ncs_cli]
+    [invoke set-ttl 3600]
+    !devices device ${device_name} tapi-context get-sip-summary
+    ?service-interface-point-count.*
+    [invoke oper-prompt]
+
+[cleanup]
+    [invoke save-logs]

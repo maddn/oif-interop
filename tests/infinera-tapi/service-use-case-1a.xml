@@ -1,0 +1,9 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-infinera-use-case-1a</name>
+  <ols-controller>infinera-tapi</ols-controller>
+  <requested-capacity-gbps>10</requested-capacity-gbps>
+  <service-layer>DSR</service-layer>
+  <layer-protocol-qualifier>tapi-dsr:DIGITAL_SIGNAL_TYPE_10_GigE_LAN</layer-protocol-qualifier>
+  <end-point-1-sip-uuid>aeec199f-1612-312b-9350-a4c0ce1c6794</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>f6282b6b-eafd-3a94-a2c5-27069a58bbbb</end-point-2-sip-uuid>
+</ols-connectivity>

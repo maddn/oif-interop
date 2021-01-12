@@ -1,0 +1,9 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-nokia-use-case-1d</name>
+  <ols-controller>nokia-tapi</ols-controller>
+  <requested-capacity-gbps>100</requested-capacity-gbps>
+  <service-layer>PHOTONIC_MEDIA</service-layer>
+  <layer-protocol-qualifier>tapi-photonic-media:PHOTONIC_LAYER_QUALIFIER_OTSi</layer-protocol-qualifier>
+  <end-point-1-sip-uuid>84150daf-e0bf-41aa-80ef-c95c399bdaa5</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>136052b9-e4dd-4a1a-b3dd-f788646f8784</end-point-2-sip-uuid>
+</ols-connectivity>

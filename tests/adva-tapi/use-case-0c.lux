@@ -1,0 +1,44 @@
+[global use_case=0c]
+[doc OIF TAPI Interop testing - use case ${use_case}]
+
+[include tapi-tests.luxinc]
+
+[shell ncs_cli]
+    [invoke set-ttl 3600]
+
+    [progress <Syncing device ${device_name}>]
+    !devices device $device_name sync-from
+    [invoke oper-prompt]
+
+    [progress <Creating connectivity-services>]
+    !config
+    [invoke cfg-prompt]
+
+    !load merge service-use-case-1a.xml
+    [invoke cfg-prompt]
+    [invoke commit]
+    [sleep 30]
+
+    !exit
+    [invoke oper-prompt]
+
+    [progress <Getting connectivity-services live-status summary>]
+    !devices device ${device_name} tapi-context get-connectivity-summary
+    ?connectivity-service-count.*
+    [invoke oper-prompt]
+
+    [progress <Cleaning up connectivity-services>]
+    !config
+    [invoke cfg-prompt]
+
+    !no ols-connectivity ${service_prefix}-1a
+    [invoke cfg-prompt]
+    [invoke commit]
+    [sleep 30]
+
+    !exit
+    [invoke oper-prompt]
+
+[cleanup]
+    [invoke delete-cisco-connectivity-services]
+    [invoke save-logs]

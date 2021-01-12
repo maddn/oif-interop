@@ -1,0 +1,9 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-nokia-use-case-1a</name>
+  <ols-controller>nokia-tapi</ols-controller>
+  <requested-capacity-gbps>10</requested-capacity-gbps>
+  <service-layer>DSR</service-layer>
+  <layer-protocol-qualifier>tapi-dsr:DIGITAL_SIGNAL_TYPE_10_GigE_LAN</layer-protocol-qualifier>
+  <end-point-1-sip-uuid>871ad1cc-bf6a-42bc-83f6-7929b341a343</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>3bc0d723-796a-48ec-85f4-3db6d793291a</end-point-2-sip-uuid>
+</ols-connectivity>

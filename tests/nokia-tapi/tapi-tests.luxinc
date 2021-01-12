@@ -1,0 +1,203 @@
+[global device_name=nokia-tapi]
+
+[global service_prefix=cisco-nokia-use-case]
+[global service_name=${service_prefix}-${use_case}]
+[global filename=service-use-case-${use_case}.xml]
+
+[include test-common.luxinc]
+
+[macro reset-logs]
+    !echo "" > ../../logs/ncs-java-vm.log
+    ?SH-PROMPT:
+    !echo "" > ../../logs/ncs-python-vm-tapi-ols.log
+    ?SH-PROMPT:
+    !echo "" > ../../logs/ned-${ned_id}-${device_name}.trace
+    ?SH-PROMPT:
+    !mkdir -p ${LUX_EXTRA_LOGS}
+    ?SH-PROMPT:
+[endmacro]
+
+[macro save-logs]
+    !cp ../../logs/ncs-java-vm.log ${LUX_EXTRA_LOGS}/
+    ?SH-PROMPT:
+    !cp ../../logs/ncs-python-vm-tapi-ols.log ${LUX_EXTRA_LOGS}/
+    ?SH-PROMPT:
+    !cp ../../logs/ned-${ned_id}-${device_name}.trace ${LUX_EXTRA_LOGS}/
+    ?SH-PROMPT:
+[endmacro]
+
+[macro delete-cisco-connectivity-services]
+    [invoke ncs_cli]
+    [invoke fail-on-error]
+    [progress <Cleanup: Syncing device ${device_name}>]
+    !devices device ${device_name} sync-from
+    [invoke oper-prompt]
+    [progress <Cleanup: Deleting all ${service_prefix}* connectivity-services>]
+    !show running-config devices device ${device_name} config context connectivity-context connectivity-service name SERVICE_NAME value | tab | include ${service_prefix} | count
+    ?Count: (\d*) lines
+    [local num_services=$1]
+    [invoke oper-prompt]
+    !config
+    [invoke cfg-prompt]
+    [loop iter 0..${num_services}]
+    !show full-configuration devices device ${device_name} config context connectivity-context connectivity-service name SERVICE_NAME value | tab | include ${service_prefix} | count
+    @Count: 0 lines
+    [invoke cfg-prompt]
+    !show full-configuration devices device ${device_name} config context connectivity-context connectivity-service name SERVICE_NAME value | tab | include ${service_prefix}
+    ?(\S*)  SERVICE_NAME  ${service_prefix}.*
+    [local uuid=$1]
+    [invoke cfg-prompt]
+    !no devices device ${device_name} config context connectivity-context connectivity-service ${uuid}
+    [invoke cfg-prompt]
+    [endloop]
+    -
+    [invoke cfg-prompt]
+    !show configuration
+    [invoke cfg-prompt]
+    !commit
+    [invoke fail-on-error]
+    ?Commit complete|% No modifications to commit.
+    [invoke cfg-prompt]
+    !exit
+    [invoke oper-prompt]
+    !exit
+    ?SH-PROMPT:
+    [sleep 45]
+[endmacro]
+
+[macro set-up]
+    [invoke ncs_cli]
+    [invoke fail-on-error]
+    !show running-config devices device ${device_name} device-type generic ned-id
+    ?device-type generic ned-id ((.*)-gen.*)$
+    [global ned_id=$1]
+    [global ned_name=$2]
+    [invoke oper-prompt]
+[endmacro]
+
+[macro set-ttl ttl]
+    !config
+    [invoke cfg-prompt]
+    !devices device ${device_name} ned-settings ${ned_name} live-status time-to-live ${ttl}
+    [invoke cfg-prompt]
+    !commit
+    [invoke cfg-prompt]
+    !exit configuration-mode
+    [invoke oper-prompt]
+[endmacro]
+
+[macro get-existing-services]
+    !show devices device ${device_name} live-status context connectivity-context connectivity-service | display curly-braces | save ${LUX_EXTRA_LOGS}/connectivity-services-before.txt
+    [invoke oper-prompt]
+[endmacro]
+
+[macro check-existing-services]
+    !show devices device ${device_name} live-status context connectivity-context connectivity-service | display curly-braces | save ${LUX_EXTRA_LOGS}/connectivity-services-after.txt
+    [invoke oper-prompt]
+    [sleep 5]
+
+[shell log]
+    !cd ${LUX_EXTRA_LOGS}
+    ?SH-PROMPT:
+    !diff --brief connectivity-services-before.txt connectivity-services-after.txt
+    -Files connectivity-services-before.txt and connectivity-services-after.txt differ
+    ?SH-PROMPT:
+[endmacro]
+
+[macro connectivity-service-test]
+    [invoke connectivity-service-test-state-check ENABLED]
+[endmacro]
+
+[macro connectivity-service-test-no-state-check]
+    [invoke connectivity-service-test-state-check "."]
+[endmacro]
+
+[macro connectivity-service-test-state-check operational-state]
+    [invoke set-ttl 15]
+    [progress <Subscribing to TAPI notifications>]
+    !devices device ${device_name} tapi-context notifications subscribe
+    [invoke oper-prompt]
+
+    [progress <TR1: Syncing device ${device_name}>]
+    !devices device ${device_name} sync-from
+    [invoke oper-prompt]
+
+    [invoke get-existing-services]
+
+    [progress <TR2: Creating service>]
+    !config
+    [invoke cfg-prompt]
+    !load merge ${filename}
+    [invoke cfg-prompt]
+    !show configuration
+    [invoke cfg-prompt]
+    !commit dry-run outformat native
+    [invoke cfg-prompt]
+    [invoke commit]
+    !exit
+    [invoke oper-prompt]
+
+    !show ols-connectivity ${service_name}
+    ?uuid *(\S*)$
+    [local uuid=$1]
+    [invoke oper-prompt]
+    [progress <Created service with UUID ${uuid}>]
+
+    [progress <Waiting for operational-state ENABLED>]
+    [loop iter 1..36]
+    [sleep 5]
+    !show ols-connectivity ${service_name} operational-state
+    @${operational-state}
+    [invoke oper-prompt]
+    [endloop]
+    [invoke oper-prompt]
+    [sleep 15]
+
+    [progress <TR3: Syncing device ${device_name}>]
+    !devices device ${device_name} sync-from
+    [invoke oper-prompt]
+    !ols-connectivity ${service_name} re-deploy dry-run
+    [invoke oper-prompt]
+
+    [progress <TR4: Getting connectivity-service from device live-status>]
+    !show devices device ${device_name} live-status context connectivity-context connectivity-service ${uuid} | display curly-braces
+    [invoke oper-prompt]
+
+    [progress <TR5: Running get-connectivity-service-connections>]
+    !devices device ${device_name} tapi-context get-connectivity-service-connections uuid ${uuid}
+    [invoke oper-prompt]
+
+    [progress <TR6: Deleting service>]
+    !config
+    [invoke cfg-prompt]
+    !no ols-connectivity ${service_name}
+    [invoke cfg-prompt]
+    !commit dry-run outformat native
+    [invoke cfg-prompt]
+    [invoke commit]
+    !exit
+    [invoke oper-prompt]
+
+    [progress <Waiting for OBJECT_DELETION notification>]
+    [loop iter 1..36]
+    [sleep 5]
+    !show devices device ${device_name} tapi-context notifications received notification target-object-identifier ${uuid} | select notification-type | include OBJECT_DELETION | count
+    @Count: 1 lines
+    [invoke oper-prompt]
+    [endloop]
+    [invoke oper-prompt]
+    [sleep 15]
+
+    [progress <TR7: Getting connectivity-services from device live-status>]
+    !show devices device ${device_name} live-status context connectivity-context connectivity-service ${uuid} | include ${uuid}
+    -^live-status context connectivity-context connectivity-service ${uuid}
+    [invoke oper-prompt]
+
+    [invoke check-existing-services]
+[endmacro]
+
+[shell ncs_cli]
+    [invoke set-up]
+
+[shell log]
+    [invoke reset-logs]

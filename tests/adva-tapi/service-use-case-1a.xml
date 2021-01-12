@@ -1,0 +1,9 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-adva-use-case-1a</name>
+  <ols-controller>adva-tapi</ols-controller>
+  <requested-capacity-gbps>100</requested-capacity-gbps>
+  <service-layer>DSR</service-layer>
+  <layer-protocol-qualifier>tapi-dsr:DIGITAL_SIGNAL_TYPE_100_GigE</layer-protocol-qualifier>
+  <end-point-1-sip-uuid>00000010-0000-0000-0000-000000041116</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>00000010-0000-0000-0000-000000040705</end-point-2-sip-uuid>
+</ols-connectivity>

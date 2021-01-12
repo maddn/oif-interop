@@ -1,0 +1,11 @@
+[global use_case=1d]
+[doc OIF TAPI Interop testing - use case ${use_case}]
+
+[include tapi-tests.luxinc]
+
+[shell ncs_cli]
+    [invoke connectivity-service-test-no-state-check]
+
+[cleanup]
+    [invoke delete-cisco-connectivity-services]
+    [invoke save-logs]

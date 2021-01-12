@@ -1,0 +1,12 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-nokia-use-case-7a</name>
+  <ols-controller>nokia-tapi-l0</ols-controller>
+  <requested-capacity-gbps>100</requested-capacity-gbps>
+  <service-layer>ODU</service-layer>
+  <layer-protocol-qualifier>tapi-odu:ODU_TYPE_ODU4</layer-protocol-qualifier>
+  <end-point-1-sip-uuid>aea9867d-a597-4dec-925c-fb1c9e509539</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>cfad3164-150d-47ec-98cf-8e646b00f1de</end-point-2-sip-uuid>
+  <restoration-policy>END_TO_END_RESTORATION</restoration-policy>
+  <protection-type>ONE_PLUS_ONE_PROTECTION_WITH_DYNAMIC_RESTORATION</protection-type>
+  <preferred-restoration-layer>PHOTONIC_MEDIA</preferred-restoration-layer>
+</ols-connectivity>

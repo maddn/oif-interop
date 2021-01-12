@@ -1,0 +1,8 @@
+<ols-connectivity xmlns="http://example.com/tapi-ols">
+  <name>cisco-infinera-use-case-1d</name>
+  <ols-controller>infinera-tapi</ols-controller>
+  <requested-capacity-gbps>100</requested-capacity-gbps>
+  <service-layer>PHOTONIC_MEDIA</service-layer>
+  <end-point-1-sip-uuid>e08fbc46-3c6a-39c3-b802-05049da568ad</end-point-1-sip-uuid>
+  <end-point-2-sip-uuid>cc9d82b3-8b3f-3bac-99c3-7a97e45f541b</end-point-2-sip-uuid>
+</ols-connectivity>
