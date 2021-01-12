@@ -90,27 +90,22 @@ class ServiceCallbacks(Service):
         template.apply('openconfig-ot-connectivity-template', vars)
 
 
-def get_link_state(root, service_end_point):
-    device = root.devices.device[service_end_point.device]
-    port = get_transceiver_port(
-        device, 'terminal-line', service_end_point.line_transceiver)
-    index = port.terminal_line.optical_channel.logical_channel.index
-    channels = device.live_status.oc_opt_term__terminal_device.logical_channels
-
-    # Stop NSO checking the key exists(RPC fails on device)
-    _ = next(iter(channels.channel), None)
-
-    return channels.channel[index].state.link_state
-
-def get_frequency(root, service_end_point):
+def get_optical_channel_state(root, service_end_point):
     device = root.devices.device[service_end_point.device]
     port = get_transceiver_port(
         device, 'terminal-line', service_end_point.line_transceiver)
     optical_channel = port.terminal_line.optical_channel
-    return device.live_status.oc_platform__components.component[
-        optical_channel.name].optical_channel.state.frequency
+    return (device.live_status.oc_platform__components.component[
+            optical_channel.name].optical_channel.state)
 
-# Check the link-state is UP and that the laser is tuned to the correct
+def check_frequency_and_power(root, service, service_end_point):
+    state = get_optical_channel_state(root, service_end_point)
+    power = float(service.target_output_power)
+
+    return (service.frequency == state.frequency and
+            (power - 0.5) < float(state.target_output_power) < (power + 0.5))
+
+# Check the transmit power and laser is tuned to the correct
 # frequency on both line ports
 class CheckOperationalStateThread(threading.Thread):
     def __init__(self, log, username, service_name):
@@ -127,18 +122,16 @@ class CheckOperationalStateThread(threading.Thread):
             elapsed = 0
             state = 'DOWN'
             while state != 'UP' and elapsed <= CHECK_OPER_STATE_TIMEOUT:
-                time.sleep(CHECK_OPER_STATE_INTERVAL)
-                elapsed += CHECK_OPER_STATE_INTERVAL
-
                 with ncs.maapi.single_read_trans(self.username, 'python') as th:
                     root = ncs.maagic.get_root(th)
                     service = root.ot_connectivity[self.service_name]
-                    if get_frequency(root, service.a_end) == service.frequency:
-                        if get_frequency(
-                                root, service.z_end) == service.frequency:
-                            state = get_link_state(root, service.a_end)
-                            if state == 'UP':
-                                state = get_link_state(root, service.z_end)
+
+                    if check_frequency_and_power(root, service, service.a_end):
+                        if check_frequency_and_power(root, service, service.z_end):
+                            state = 'UP'
+
+                time.sleep(CHECK_OPER_STATE_INTERVAL)
+                elapsed += CHECK_OPER_STATE_INTERVAL
 
             with ncs.maapi.single_write_trans(self.username, 'python') as th:
                 root = ncs.maagic.get_root(th)
