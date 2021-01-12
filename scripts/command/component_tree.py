@@ -52,13 +52,14 @@ def print_component_tree():
     with maapi.start_read_trans() as trans:
         root = ncs.maagic.get_root(trans)
 
-        for device in root.openconfig_cache.device:
-            cache = device.components.component
+        for device in root.devices.device:
+            cache = device.openconfig_cache.components.component
 
-            print(f'Device: {device.name}')
-            for component in cache:
-                if str(component.type).endswith('CHASSIS'):
-                    print_component(component.name, cache)
+            if cache:
+                print(f'Device: {device.name}')
+                for component in cache:
+                    if str(component.type).endswith('CHASSIS'):
+                        print_component(component.name, cache)
 
 def process_args(args):
     if len(args) > 1:
