@@ -1,0 +1,19 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint = "tapi-connectivity-service-servicepoint"
+                 componenttype = "td:open-terminals"
+                 state = "td:configure">
+
+  <ot-connectivity xmlns="http://example.com/openconfig-open-terminals">
+    <name>{$SERVICE_NAME}</name>
+    <frequency>195300000</frequency>
+    <target-output-power>-6.0</target-output-power>
+    <a-end>
+      <device>{$A_END_DEVICE}</device>
+      <client-transceiver>{$A_END_TRANSCEIVER}</client-transceiver>
+    </a-end>
+    <z-end>
+      <device>{$Z_END_DEVICE}</device>
+      <client-transceiver>{$Z_END_TRANSCEIVER}</client-transceiver>
+    </z-end>
+  </ot-connectivity>
+</config-template>

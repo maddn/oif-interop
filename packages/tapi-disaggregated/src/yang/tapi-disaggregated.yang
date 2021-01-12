@@ -1,0 +1,181 @@
+module tapi-disaggregated {
+  yang-version 1.1;
+  namespace "http://example.com/tapi-disaggregated";
+  prefix td;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  import openconfig-platform {
+    prefix oc-platform;
+  }
+
+  import tapi-common {
+    prefix tapi-common;
+  }
+  import tapi-topology {
+    prefix tapi-topology;
+  }
+
+  description
+    "Bla bla...";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  augment /tapi-common:context {
+    tailf:action generate {
+      tailf:actionpoint generate-ot-tapi-data;
+    }
+
+    tailf:action delete {
+      tailf:actionpoint delete-ot-tapi-data;
+    }
+  }
+
+  augment /tapi-common:context/tapi-topology:topology-context {
+    container inter-domain-links {
+      list link {
+        key plug-id;
+
+        leaf plug-id {
+          type string;
+        }
+
+        leaf ot-device {
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+        }
+
+        leaf ot-transceiver {
+          type leafref {
+            path "deref(../ot-device)/../ncs:config/oc-platform:components" +
+                 "/oc-platform:component/oc-platform:name";
+          }
+        }
+
+        leaf ols-controller {
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+        }
+
+        leaf sip-uuid {
+          type string;
+        }
+      }
+    }
+  }
+
+  augment /tapi-common:context/tapi-common:service-interface-point {
+    leaf inter-domain-plug-id {
+      type string;
+    }
+  }
+
+  identity open-terminals {
+    base ncs:plan-component-type;
+  }
+
+  identity ols-controller {
+    base ncs:plan-component-type;
+  }
+
+  identity configure {
+    base ncs:plan-state;
+  }
+
+  ncs:plan-outline tapi-connectivity-service-plan {
+    description
+    "Plan for TAPI disaggregated connectivity-service, split into open-terminals
+     and ols-controller components (ran in order). Both components wait for the
+     operational-state before completing";
+
+    ncs:component-type "ncs:self" {
+      ncs:state "ncs:init";
+      ncs:state "ncs:ready" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor  "$SERVICE/plan/component[name='ols-controller']/state[name='ncs:ready']" {
+              ncs:trigger-expr "status='reached'";
+            }
+          }
+        }
+      }
+    }
+
+    ncs:component-type "open-terminals" {
+      ncs:state "ncs:init" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "configure" {
+        ncs:create {
+          ncs:nano-callback;
+          ncs:post-action-node "/ot-connectivity[name=$SERVICE_NAME]" {
+            ncs:action-name "check-operational-state";
+          }
+        }
+      }
+      ncs:state "ncs:ready" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor  "/ot-connectivity[name=$SERVICE_NAME]" {
+              ncs:trigger-expr "operational-state='UP'";
+            }
+          }
+        }
+      }
+    }
+
+    ncs:component-type "ols-controller" {
+      ncs:state "ncs:init" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor  "$SERVICE/plan/component[name='open-terminals']/state[name='ncs:ready']" {
+              ncs:trigger-expr "status='reached'";
+            }
+          }
+        }
+      }
+      ncs:state "configure" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "ncs:ready" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor  "/ols-connectivity[name=$SERVICE_NAME]" {
+              ncs:trigger-expr "operational-state='ENABLED'";
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ncs:service-behavior-tree tapi-connectivity-service-servicepoint {
+    ncs:plan-outline-ref tapi-connectivity-service-plan;
+
+    ncs:selector {
+      ncs:create-component "'self'" {
+        ncs:component-type-ref "ncs:self";
+      }
+      ncs:create-component "'open-terminals'" {
+        ncs:component-type-ref "open-terminals";
+      }
+      ncs:create-component "'ols-controller'" {
+        ncs:component-type-ref "ols-controller";
+      }
+    }
+  }
+}

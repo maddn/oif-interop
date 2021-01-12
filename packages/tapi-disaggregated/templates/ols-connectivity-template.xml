@@ -1,0 +1,40 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint = "tapi-connectivity-service-servicepoint"
+                 componenttype = "td:ols-controller"
+                 state = "td:configure">
+
+  <?set-root-node {/}?>
+  <?set A_END_LINE_TRANSCEIVER = {/ot-connectivity[name=$SERVICE_NAME]/a-end/line-transceiver?>
+  <?set Z_END_LINE_TRANSCEIVER = {/ot-connectivity[name=$SERVICE_NAME]/z-end/line-transceiver?>
+
+  <ols-connectivity xmlns="http://example.com/tapi-ols">
+    <name>{$SERVICE_NAME}</name>
+
+    <?save-context service?>
+    <?set-context-node {/tapi-common:context/tapi-topology:topology-context
+                        /inter-domain-links/link[ot-device=$A_END_DEVICE]
+                                                [ot-transceiver=$A_END_LINE_TRANSCEIVER]}?>
+    <ols-controller>{ols-controller}</ols-controller>
+    <a-end-sip-uuid>{sip-uuid}</a-end-sip-uuid>
+    <z-end-sip-uuid>{../link[ot-device=$Z_END_DEVICE]
+                                  [ot-transceiver=$Z_END_LINE_TRANSCEIVER]/sip-uuid}</z-end-sip-uuid>
+    <?switch-context service?>
+
+    <requested-capacity-gbps
+      when="{requested-capacity/total-size/unit = 'GBPS'}"
+      >{requested-capacity/total-size/value}</requested-capacity-gbps>
+    <service-layer>PHOTONIC_MEDIA</service-layer>
+    <layer-protocol-qualifier>tapi-photonic-media:PHOTONIC_LAYER_QUALIFIER_OCH</layer-protocol-qualifier>
+
+    <constraints>
+      <include-link>{include-link}</include-link>
+      <exclude-link>{exclude-link}</exclude-link>
+      <include-node>{include-node}</include-node>
+      <exclude-node>{exclude-node}</exclude-node>
+    </constraints>
+
+    <restoration-policy>{resilience-type/restoration-policy}</restoration-policy>
+    <protection-type>{resilience-type/protection-type}</protection-type>
+    <preferred-restoration-layer>{preferred-restoration-layer}</preferred-restoration-layer>
+  </ols-connectivity>
+</config-template>

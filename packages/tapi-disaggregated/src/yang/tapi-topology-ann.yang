@@ -1,0 +1,20 @@
+module tapi-topology-ann {
+  namespace "urn:onf:otcc:yang:tapi-topology-ann";
+  prefix tapi-topology-ann;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import tapi-common {
+    prefix tapi-common;
+  }
+  import tapi-topology {
+    prefix tapi-topology;
+  }
+
+  tailf:annotate /tapi-common:context/tapi-topology:topology-context/tapi-topology:topology {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+}

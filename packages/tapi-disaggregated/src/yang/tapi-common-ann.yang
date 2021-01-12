@@ -1,0 +1,41 @@
+module tapi-common-ann {
+  namespace "urn:onf:otcc:yang:tapi-common-ann";
+  prefix tapi-common-ann;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import tapi-common {
+    prefix tapi-common;
+  }
+
+  tailf:annotate /tapi-common:context/tapi-common:service-interface-point/tapi-common:operational-state {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+
+  tailf:annotate /tapi-common:context/tapi-common:service-interface-point/tapi-common:layer-protocol-name {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+
+  tailf:annotate /tapi-common:context/tapi-common:service-interface-point/tapi-common:supported-layer-protocol-qualifier {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+
+  tailf:annotate /tapi-common:context/tapi-common:service-interface-point/tapi-common:total-potential-capacity {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+
+  tailf:annotate /tapi-common:context/tapi-common:service-interface-point/tapi-common:available-capacity {
+    tailf:cdb-oper {
+      tailf:persistent true;
+    }
+  }
+}

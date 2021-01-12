@@ -10,6 +10,9 @@ module tapi-connectivity {
     import tapi-path-computation {
         prefix tapi-path-computation;
     }
+    import tailf-ncs {
+      prefix ncs;
+    }
     organization "ONF OTCC (Open Transport Configuration & Control) Project";
     contact "
          Project Web: <https://urldefense.com/v3/__https://wiki.opennetworking.org/display/OTCC/TAPI__;!!OSsGDw!bx-l35NqfQHpJ8R_DmXfi2NX2ll5dMl9VbK5aS_m3ZShiVoz74Ur_yiFzE6g$ >
@@ -412,6 +415,9 @@ module tapi-connectivity {
     grouping connectivity-context {
         list connectivity-service {
             key 'uuid';
+            ncs:servicepoint tapi-connectivity-service-servicepoint;
+            uses ncs:service-data;
+            uses ncs:nano-plan-data;
             uses connectivity-service;
             description "none";
         }

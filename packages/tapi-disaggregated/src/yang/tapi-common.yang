@@ -156,7 +156,6 @@ module tapi-common {
     }
     container context {
         uses tapi-context;
-        presence "Root container for all TAPI interaction";
         description "none";
     }
     grouping tapi-context {

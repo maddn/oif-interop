@@ -4,13 +4,15 @@ all: fxs
 # Include standard NCS examples build definitions and rules
 include $(NCS_DIR)/src/ncs/build/include.ncs.mk
 
-SRC = $(wildcard yang/*.yang)
+YANG = $(wildcard yang/*.yang)
+SRC = $(filter-out %-ann.yang, $(YANG))
 DIRS = ../load-dir java/src/$(JDIR)/$(NS)
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 
 ## Uncomment and patch the line below if you have a dependency to a NED
 ## or to other YANG files
-YANGPATH += yang/
+YANGPATH += ../../openconfig-ot-cisco-nc-1.0/src/ncsc-out/modules/yang \
+	yang
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)
@@ -21,8 +23,8 @@ $(DIRS):
 	mkdir -p $@
 
 ../load-dir/%.fxs: yang/%.yang
-	$(NCSC)  `ls $*-ann.yang  > /dev/null 2>&1 && echo "-a $*-ann.yang"` \
-             $(NCSCPATH) -c -o $@ $<
+	$(NCSC)  `ls yang/$*-ann.yang > /dev/null 2>&1 && echo "-a yang/$*-ann.yang"` \
+	         $(NCSCPATH) -c -o $@ $<
 
 clean:
 	rm -rf $(DIRS)
