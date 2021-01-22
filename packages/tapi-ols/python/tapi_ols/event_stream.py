@@ -47,6 +47,9 @@ class EventStream(threading.Thread):
                 key = json_data['eventTime']
             json_data = json_data['tapi-notification:notification']
 
+            if key and 'target-object-identifier' in json_data:
+                key = (f'{key} - {json_data["target-object-identifier"][-36:]}')
+
         if 'uuid' in json_data:
             key = json_data['uuid']
 
