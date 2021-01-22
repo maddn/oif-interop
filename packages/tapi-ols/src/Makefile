@@ -8,8 +8,8 @@ SRC = $(wildcard yang/*.yang)
 DIRS = ../load-dir java/src/$(JDIR)/$(NS)
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 
-YANGPATH += ../../../../../git/onf-tapi_rc/src/ncsc-out/modules/yang \
-	../../../../../git/nokia-nrct/src/ncsc-out/modules/yang
+YANGPATH += ../../../../../git/nokia-nrct/src/ncsc-out/modules/yang \
+	../../../../../git/onf-tapi_rc/src/ncsc-out/modules/yang
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)
