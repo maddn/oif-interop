@@ -49,7 +49,6 @@
                   <restoration-policy>{restoration-policy}</restoration-policy>
                   <protection-type>{protection-type}</protection-type>
                 </resilience-type>
-                <reversion-mode>REVERTIVE</reversion-mode>
                 <preferred-restoration-layer>{preferred-restoration-layer}</preferred-restoration-layer>
               <?end?>
             </connectivity-service>

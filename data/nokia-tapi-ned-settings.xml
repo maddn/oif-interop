@@ -1,0 +1,131 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>nokia-tapi</name>
+      <ned-settings>
+        <nokia-nrct xmlns="http://tailf.com/ned/nokia-nrct/meta">
+          <connection>
+            <authentication>
+              <method>cas</method>
+            </authentication>
+            <ssl>
+              <certificate>MIIK7TCCCdWgAwIBAgIRAN4+Ux1nbl9NYYRhv5Q2nR0wDQYJKoZIhvcNAQELBQAwLzELMAkG
+A1UEBhMCRkkxEDAOBgNVBAgTB0ZpbmxhbmQxDjAMBgNVBAoTBU5va2lhMB4XDTIwMDkxNDE2
+MjcwOVoXDTMwMDkxMjE3MjcwNlowIDEOMAwGA1UEChMFTm9raWExDjAMBgNVBAMTBW5mbS10
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtf8KTf7bUjbbysn7sFXSE4er+f88
+aglu4YvgfLtyKUXRd9WDqvI19UUFWvvtRqLC9glydTK82jU/M4p2gqcuhxb05e13eij8mVez
+ampo3U/dIdbBfbUPHgojNyPf+VbySZ1kTRpnsxiRk0rDe/wT0C8Ang7ApK+D2Fy0o4QydxY0
+kkBzfX6rArxGwPpICuacbGL2N98UpJ0noPqBicI9Ne/x1hTAC+Xk4KK32ZuTt0nMmh8Vdoe+
+8ikIFvutInp54Ro/QY/abAbUQENk/Sr/zVKYGQ+s4cy/W9CWdTp1c2A4s3AOc+oocKYkE5gj
+M8PjAmjRvf8Ods7CxD0yiYPFLQIDAQABo4IIETCCCA0wDgYDVR0PAQH/BAQDAgWgMB0GA1Ud
+JQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAfBgNVHQ4EGAQWBBQAE2vGWtDfFrHl8uk1gZ2g
+tspPsjAfBgNVHSMEGDAWgBS45XaGlF8uOryi+SyxR4w+zXS7yTCCB5gGA1UdEQSCB48wggeL
+gglsb2NhbGhvc3SCCWFkYXB0ZXItYYIJYWRhcHRlci1igglhZGFwdGVyLWOCCWFkYXB0ZXIt
+ZIIIYWRhcHRlcnOCBWJlbmNogghkYXRhYmFzZYIKZGItYWRhcHQtYoIKZGItYWRhcHQtY4IK
+ZGItYWRhcHQtZIIHaXB2Nm5hdIIHbGljZW5zZYIJbW5jLWFkbWluggttbmMtaGFwcm94eYIJ
+bmZtdC1kYXRhgghuZm10LW5uYYIKbmZtdC1zZXR1cIIMbmZtdC1zeXNwcmVmgghuZm10LXRu
+YYINbm90aWYtYWRhcHQtYYINbm90aWYtYWRhcHQtYoINbm90aWYtYWRhcHQtY4INbm90aWYt
+YWRhcHQtZIIJbnJjdC1pZXRmgglucmN0LXRhcGmCBW5zcG9zggRudHNtggtvdG5hY3RpdmVt
+cYIHb3RuY29yZYIIb3Rua2Fma2GCCG90bm5vdGlmgglvdG50b21jYXSCDG90bnpvb2tlZXBl
+coIJcG1uZXh0Z2VuggN3c2+HBH8AAAGHBKwfAQGHBKwfAQKHBKwfAQOHBKwfAQSHBKwfAQWH
+BKwfAQaHBKwfAQeHBKwfAQiHBKwfAQmHBKwfAQqHBKwfAQuHBKwfAQyHBKwfAQ2HBKwfAQ6H
+BKwfAQ+HBKwfARCHBKwfARGHBKwfARKHBKwfAROHBKwfARSHBKwfARWHBKwfARaHBKwfAReH
+BKwfARiHBKwfARmHBKwfARqHBKwfARuHBKwfARyHBKwfAR2HBKwfAR6HBKwfAR+HBKwfASCH
+BKwfASGHBKwfASKHBKwfASOHBKwfASSHBKwfASWHBKwfASaHBKwfASeHBKwfASiHBKwfASmH
+BKwfASqHBKwfASuHBKwfASyHBKwfAS2HBKwfAS6HBKwfAS+HBKwfATCHBKwfATGHBKwfATKH
+BKwfATOHBKwfATSHBKwfATWHBKwfATaHBKwfATeHBKwfATiHBKwfATmHBKwfATqHBKwfATuH
+BKwfATyHBKwfAT2HBKwfAT6HBKwfAT+HBKwfAUCHBKwfAUGHBKwfAUKHBKwfAUOHBKwfAUSH
+BKwfAUWHBKwfAUaHBKwfAUeHBKwfAUiHBKwfAUmHBKwfAUqHBKwfAUuHBKwfAUyHBKwfAU2H
+BKwfAU6HBKwfAU+HBKwfAVCHBKwfAVGHBKwfAVKHBKwfAVOHBKwfAVSHBKwfAVWHBKwfAVaH
+BKwfAVeHBKwfAViHBKwfAVmHBKwfAVqHBKwfAVuHBKwfAVyHBKwfAV2HBKwfAV6HBKwfAV+H
+BKwfAWCHBKwfAWGHBKwfAWKHBKwfAWOHBKwfAWSHBKwfAWWHBKwfAWaHBKwfAWeHBKwfAWiH
+BKwfAWmHBKwfAWqHBKwfAWuHBKwfAWyHBKwfAW2HBKwfAW6HBKwfAW+HBKwfAXCHBKwfAXGH
+BKwfAXKHBKwfAXOHBKwfAXSHBKwfAXWHBKwfAXaHBKwfAXeHBKwfAXiHBKwfAXmHBKwfAXqH
+BKwfAXuHBKwfAXyHBKwfAX2HBKwfAX6HBKwfAX+HBKwfAYCHBKwfAYGHBKwfAYKHBKwfAYOH
+BKwfAYSHBKwfAYWHBKwfAYaHBKwfAYeHBKwfAYiHBKwfAYmHBKwfAYqHBKwfAYuHBKwfAYyH
+BKwfAY2HBKwfAY6HBKwfAY+HBKwfAZCHBKwfAZGHBKwfAZKHBKwfAZOHBKwfAZSHBKwfAZWH
+BKwfAZaHBKwfAZeHBKwfAZiHBKwfAZmHBKwfAZqHBKwfAZuHBKwfAZyHBKwfAZ2HBKwfAZ6H
+BKwfAZ+HBKwfAaCHBKwfAaGHBKwfAaKHBKwfAaOHBKwfAaSHBKwfAaWHBKwfAaaHBKwfAaeH
+BKwfAaiHBKwfAamHBKwfAaqHBKwfAauHBKwfAayHBKwfAa2HBKwfAa6HBKwfAa+HBKwfAbCH
+BKwfAbGHBKwfAbKHBKwfAbOHBKwfAbSHBKwfAbWHBKwfAbaHBKwfAbeHBKwfAbiHBKwfAbmH
+BKwfAbqHBKwfAbuHBKwfAbyHBKwfAb2HBKwfAb6HBKwfAb+HBKwfAcCHBKwfAcGHBKwfAcKH
+BKwfAcOHBKwfAcSHBKwfAcWHBKwfAcaHBKwfAceHBKwfAciHBKwfAcmHBKwfAcqHBKwfAcuH
+BKwfAcyHBKwfAc2HBKwfAc6HBKwfAc+HBKwfAdCHBKwfAdGHBKwfAdKHBKwfAdOHBKwfAdSH
+BKwfAdWHBKwfAdaHBKwfAdeHBKwfAdiHBKwfAdmHBKwfAdqHBKwfAduHBKwfAdyHBKwfAd2H
+BKwfAd6HBKwfAd+HBKwfAeCHBKwfAeGHBKwfAeKHBKwfAeOHBKwfAeSHBKwfAeWHBKwfAeaH
+BKwfAeeHBKwfAeiHBKwfAemHBKwfAeqHBKwfAeuHBKwfAeyHBKwfAe2HBKwfAe6HBKwfAe+H
+BKwfAfCHBKwfAfGHBKwfAfKHBKwfAfOHBKwfAfSHBKwfAfWHBKwfAfaHBKwfAfeHBKwfAfiH
+BKwfAfmHBKwfAfqHBKwfAfuHBKwfAfyHBKwfAf2HBKwfAf6HBIuyQ9YwDQYJKoZIhvcNAQEL
+BQADggEBAG5H2T1+bSXJM0KnBmu7Rh6RtYaQTHiqraYalMyaCd/oRX+l//rS4Q3/7RTIMOjh
+1TW4XWwgeOCMKemwdrjhN/9DcFyeiNOFceBIXcDsWGfv6L6ZWuRT2ZIZsnJnRnNQM3wycANE
+b5+Oe5WlkutQUlrcObfmwwotzJS4j2hQDOjEqttxMFgP3XxSvAWJoJQs2wpEVG3VgHYVzFWb
+IUCKdo7Q9ffBbM1DAbVgxl8ML7FLVPrTjQL0PhI7kmCu2Ey5heAECNQbfuynvagAznQ/Knoe
+sDpcLAT21swDVbTOYKTkD/7mBOI9tDVaKE41RwrWK8MXjOR1qXqAPJQ/bcFOxA4=</certificate>
+            </ssl>
+          </connection>
+          <live-status>
+            <time-to-live>1800</time-to-live>
+          </live-status>
+          <restconf>
+            <url-base>/tapi</url-base>
+            <model-discovery>enabled</model-discovery>
+            <live-status>
+              <call-point>paths-in-query-parameters</call-point>
+              <query-parameters>
+                <path>/tapi-common:context</path>
+                <depth>3</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/service-interface-point</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-connectivity:connectivity-context/connection</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-connectivity:connectivity-context/connectivity-service</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-equipment:physical-context</path>
+                <depth>2</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-equipment:physical-context/device/access-port</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-equipment:physical-context/physical-span</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-topology:topology-context/nw-topology-service</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-topology:topology-context/topology</path>
+                <depth>3</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-topology:topology-context/topology/link</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-topology:topology-context/topology/node</path>
+                <depth>3</depth>
+              </query-parameters>
+              <query-parameters>
+                <path>/tapi-common:context/tapi-topology:topology-context/topology/node/owned-node-edge-point</path>
+                <depth>unbounded</depth>
+              </query-parameters>
+            </live-status>
+            <deviations>
+              <nokia-nrct>true</nokia-nrct>
+            </deviations>
+          </restconf>
+        </nokia-nrct>
+      </ned-settings>
+    </device>
+  </devices>
+</config>

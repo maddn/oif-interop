@@ -1,0 +1,42 @@
+{
+  "tapi-connectivity:connectivity-service": [
+    {
+      "uuid": "c15c0000-0000-0000-0000-000000000001",
+      "end-point": [
+        {
+          "local-id": "a",
+          "layer-protocol-name": "DSR",
+          "layer-protocol-qualifier": "tapi-dsr:DIGITAL_SIGNAL_TYPE_100_GigE",
+          "service-interface-point": {
+            "service-interface-point-uuid": "00000010-0000-0000-0000-000000079235"
+          }
+        },
+        {
+          "local-id": "z",
+          "layer-protocol-name": "DSR",
+          "layer-protocol-qualifier": "tapi-dsr:DIGITAL_SIGNAL_TYPE_100_GigE",
+          "service-interface-point": {
+            "service-interface-point-uuid": "00000010-0000-0000-0000-000000079226"
+          }
+        }
+      ],
+      "name": [
+        {
+          "value-name": "NAME",
+          "value": "cisco-adva-e2e-service"
+        }
+      ],
+      "requested-capacity": {
+        "total-size": {
+          "value": "100",
+          "unit": "GBPS"
+        }
+      },
+      "resilience-type": {
+          "protection-type": "DYNAMIC_RESTORATION",
+          "restoration-policy": "PER_DOMAIN_RESTORATION"
+      },
+      "include-link": [ "30000060-0000-0000-0000-000000041001" ]
+    }
+  ]
+}

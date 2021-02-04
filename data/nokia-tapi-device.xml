@@ -1,0 +1,49 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <authgroups>
+      <group>
+        <name>nokia</name>
+        <default-map>
+          <remote-name>admin</remote-name>
+          <remote-password>$9$DgZg3aWTTepN/m9kW92ZbChsaAkSfJm4tr0U8eRhMEo=</remote-password>
+        </default-map>
+      </group>
+    </authgroups>
+    <device>
+      <name>nokia-tapi</name>
+      <address>139.178.67.214</address>
+      <port>8543</port>
+      <authgroup>nokia</authgroup>
+      <device-type>
+        <generic>
+          <ned-id xmlns:nokia-nrct-gen-1.0="http://tail-f.com/ns/ned-id/nokia-nrct-gen-1.0">nokia-nrct-gen-1.0:nokia-nrct-gen-1.0</ned-id>
+        </generic>
+      </device-type>
+      <connect-timeout>3000</connect-timeout>
+      <read-timeout>3000</read-timeout>
+      <write-timeout>3000</write-timeout>
+      <trace>raw</trace>
+      <state>
+        <admin-state>unlocked</admin-state>
+      </state>
+    </device>
+    <device>
+      <name>nokia-tapi-l0</name>
+      <address>139.178.67.166</address>
+      <port>8543</port>
+      <authgroup>nokia</authgroup>
+      <device-type>
+        <generic>
+          <ned-id xmlns:nokia-nrct-gen-1.0="http://tail-f.com/ns/ned-id/nokia-nrct-gen-1.0">nokia-nrct-gen-1.0:nokia-nrct-gen-1.0</ned-id>
+        </generic>
+      </device-type>
+      <connect-timeout>1800</connect-timeout>
+      <read-timeout>1800</read-timeout>
+      <write-timeout>1800</write-timeout>
+      <trace>raw</trace>
+      <state>
+        <admin-state>unlocked</admin-state>
+      </state>
+    </device>
+  </devices>
+</config>

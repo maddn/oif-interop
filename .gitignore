@@ -1,1 +1,8 @@
+logs/
+ncs-cdb/
+state/
+
+storedstate
 *.fxs
+
+local/

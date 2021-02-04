@@ -42,22 +42,25 @@ def get_topology_list(topology_context):
     return [topology.uuid
             for topology in topology_context.topology]
 
+
 class TopologySummary(Action):
     def process_topology(self, topology):
         output_topology = self.output.topology.create(topology.uuid)
 
-        # Generate GET for each link
+        # Access a leaf-list to force a new GET
         output_topology.link_count = len([
-            len(link.name) for link in topology.link])
+            len(link.layer_protocol_name) for link in topology.link])
 
         for node in topology.node:
             output_node = output_topology.node.create(node.uuid)
             missing_inventory_id = 0
 
             # Generate GET for each node
-            _ = len(node.name)
+            _ = len(node.layer_protocol_name)
 
             for onep in node.owned_node_edge_point:
+                # Generate GET for each owned-node-edge-point
+                _ = len(onep.supported_cep_layer_protocol_qualifier)
                 access_port = onep.supporting_access_port.access_port
 
                 if access_port.access_port_uuid:
@@ -65,7 +68,6 @@ class TopologySummary(Action):
                         access_port.access_port_uuid, access_port.device_uuid,
                         onep.uuid, node.uuid, topology.uuid))
 
-                # Generate GET for each owned-node-edge-point
                 missing_inventory_id += check_bad_inventory_id(onep)
 
             output_node.missing_inventory_id_count = missing_inventory_id
@@ -121,6 +123,8 @@ class ConnectivitySummary(Action):
                 device_name].live_status.tapi_common__context.
                 tapi_connectivity__connectivity_context.connectivity_service)
 
+            # Need second transaction here because TTL is added for connection
+            # list by GET on connectivity-context.
             with ncs.maapi.single_read_trans(uinfo.username, 'python') as th2:
                 connections = (ncs.maagic.get_root(th2).devices.device[
                     device_name].live_status.tapi_common__context.
