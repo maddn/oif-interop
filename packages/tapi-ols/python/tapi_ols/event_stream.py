@@ -73,6 +73,7 @@ class EventStream(threading.Thread):
                 try:
                     decoded = json_chunk.decode('utf-8').strip('\r\n\t ')
                     if decoded and decoded != 'data:':
+                        decoded = re.sub('^data:', '', decoded, flags=re.M)
                         json_data = json.loads(re.sub(r'^[^\{]*', '', decoded))
                         if len(json_data) > 0:
                             self.log.info(json.dumps(json_data, indent=4))
@@ -89,24 +90,31 @@ class TapiSubscribe(Action):
             root = ncs.maagic.get_root(th)
             device = root.devices.device[device_name]
             notifications = device.tapi_context.notifications
+            nokia_attr = getattr(device.ned_settings,"nokia_nrct", None)
+            onf_tapi_attr = getattr(device.ned_settings,"onf_tapi_rc", None)
 
+            assert(nokia_attr != None or onf_tapi_attr != None)
+
+            ned_settings = nokia_attr if nokia_attr != None else onf_tapi_attr 
+            auth_method = ned_settings.connection.authentication.method.string
             get_header_action = device.live_status.exec.get_login_header
             get_header_input = get_header_action.get_input()
             get_header_input.url = notifications.login_path
             get_header_output = get_header_action(get_header_input)
-            self.log.info('Got login header')
+            self.log.info('Got login header %s' % get_header_output.result)
 
             return ('https://{}:{}{}'.format(device.address, device.port,
                                              notifications.subscription_path),
                     device.device_type.generic.ned_id,
-                    get_header_output.result)
+                    get_header_output.result,
+                    auth_method)
 
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
         device_name = str(kp[2][0])
-        (url, ned_id, header) = self.get_device_details(uinfo.username,
+        (url, ned_id, header, method) = self.get_device_details(uinfo.username,
                                                         device_name)
-        headers = {'Cookie' if ned_id.startswith('nokia-nrct-gen') else
+        headers = {'Cookie' if 'cas' in method else
                    'Authorization': header,
                    'Accept': 'text/event-stream'}
 

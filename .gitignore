@@ -6,3 +6,4 @@ storedstate
 *.fxs
 
 local/
+.DS_Store
